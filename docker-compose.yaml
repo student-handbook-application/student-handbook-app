@@ -1,0 +1,13 @@
+version: '3.10.9'
+
+services:
+  app: 
+    build: .
+    container_name: "pengi_container"
+    image: "pengi-image"
+    ports:
+      - 8000:8000
+    volumes:
+      - .:/code
+    env_file:
+      - .env
