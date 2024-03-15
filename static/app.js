@@ -38,7 +38,7 @@ const generateResponse = (chatElement) => {
     // Send POST request to API, get response and set the reponse as paragraph text
     fetch("/get", requestOptions).then(res => res.json()).then(data => {
         console.log(data)
-        messageElement.textContent = data.processed_message.result ? "Pengi \n"+data.processed_message.result.trim() : data.processed_message.trim();
+        messageElement.textContent = data.processed_message.result ? data.processed_message.result.trim() : data.processed_message.trim();
     }).catch(() => {
         messageElement.classList.add("error");
         messageElement.textContent = "Đã xảy ra lỗi vui lòng thử lại.";
