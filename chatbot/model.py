@@ -15,7 +15,9 @@ def Chatbot(msg):
 
     template = """<|im_start|>system\nChỉ sử dụng thông tin sau đây để trả lời câu hỏi. Nếu câu hỏi không liên quan dến nội dung sau đây, hãy trả lời rằng bạn không biết câu trả lời, đừng cố sinh thêm thông tin để trả lời\n
 {context}<|im_end|>\n<|im_start|>user\n{question}<|im_end|>\n<|im_start|>assitant"""
-            
+    model = Model(model_id, hf_api, 0.01)
+    llm = model.load_model()
+    prompt = create_prompt(template) 
 
 
     client = qdrant_client.QdrantClient(
@@ -42,14 +44,8 @@ def Chatbot(msg):
     for hit in hits:
         if hit.score > 0.49:
             print('da chay 1')
-            print(hit.score)
             return f"{hit.payload['Answers']}"
-
         else: 
             print('da chay 2')
-            model = Model(model_id, hf_api, 0.01)
-            llm = model.load_model()
-            prompt = create_prompt(template)
-    
             qa_chain = create_qa_chain(llm, doc_store, prompt)
             return qa_chain.invoke(msg)
