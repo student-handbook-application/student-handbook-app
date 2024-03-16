@@ -53,9 +53,6 @@ def Chatbot(msg):
             return f"{hit.payload['Answers']}"
         else: 
             print('da chay 2')
-            
-            
-    
             qa_chain = create_qa_chain(llm, doc_store, prompt)
             return qa_chain.invoke(msg)
 
