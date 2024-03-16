@@ -8,18 +8,12 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from sentence_transformers import SentenceTransformer
 from chatbot.chatbot import Model, create_prompt, create_qa_chain
 
-# client = qdrant_client.QdrantClient(
-#     url = os.getenv("QDRANT_HOST"),
-#     api_key = os.getenv("QDRANT_API_KEY")
-# )
-
-# model = SentenceTransformer('keepitreal/vietnamese-sbert')
 
 def Chatbot(msg):
     torch.cuda.empty_cache()
     hf_api ,hf_embedding_model, model_id, url_database, api_key_database = load_auguments()
 
-    template = """<|im_start|>system\nSử dụng thông tin sau đây để trả lời câu hỏi. Nếu bạn không biết câu trả lời, hãy nói không biết, đừng cố tạo ra câu trả lời\n
+    template = """<|im_start|>system\nChỉ sử dụng thông tin sau đây để trả lời câu hỏi. Nếu câu hỏi không liên quan dến nội dung sau đây, hãy trả lời rằng bạn không biết câu trả lời, đừng cố sinh thêm thông tin để trả lời\n
 {context}<|im_end|>\n<|im_start|>user\n{question}<|im_end|>\n<|im_start|>assitant"""
     model = Model(model_id, hf_api, 0.01)
     llm = model.load_model()
@@ -55,4 +49,3 @@ def Chatbot(msg):
             print('da chay 2')
             qa_chain = create_qa_chain(llm, doc_store, prompt)
             return qa_chain.invoke(msg)
-
