@@ -49,10 +49,8 @@ def Chatbot(msg):
     # print('da chay')
     for hit in hits:
         if hit.score > 0.49:
-            print('da chay 1')
             return f"{hit.payload['Answers']}"
         else: 
-            print('da chay 2')
             qa_chain = create_qa_chain(llm, doc_store, prompt)
             return qa_chain.invoke(msg)
 
