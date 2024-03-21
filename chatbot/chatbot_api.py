@@ -12,17 +12,12 @@ def get_bot_response():
     try:
         # Lấy dữ liệu JSON từ yêu cầu POST
         data = request.json
-
-        print(data)
+        
         # Kiểm tra xem dữ liệu có tồn tại và có chứa key 'messages' không
         if data  and 'messages' in data:
-            print("da chay")
             messages = data['messages']
-            print(messages)
             # Trả về nội dung của tin nhắn đầu tiên
-            print(messages[0]['content'])
             first_message_content = messages[0]['content'] # vd ng dung nhap hello thi no se lay chu hello \
-            print(first_message_content)
             processed_data = {"processed_message": Chatbot(first_message_content)}
             
             # Trả về kết quả xử lý dưới dạng JSON
