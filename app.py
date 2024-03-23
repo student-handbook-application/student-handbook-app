@@ -1,9 +1,6 @@
 from flask import Flask, url_for, render_template, request
 from chatbot import chatbot_api
 import os
-from dotenv import load_dotenv
-
-load_dotenv()
 SECRET_KEY = os.environ.get("KEY")
 DB_NAME = os.environ.get("DB_NAME")
 
