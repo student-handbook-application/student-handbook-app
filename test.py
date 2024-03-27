@@ -94,13 +94,16 @@ def run_and_save(qa_chain: dict, input_file_path: str, save_csv: str, wait_time:
                     result = qa_chain.invoke(query)
                     inference_time = time.time() - start_time
 
-                    writer.writerow({'result': result, 'inference_time': inference_time, 'device': device})
+                    result_text = result['result'] if 'result' in result else ''
+
+
+                    writer.writerow({'query': query, 'result': result_text, 'inference_time': inference_time, 'device': device})
 
                     #time.sleep(wait_time)
 
 def main() -> None:
     data_path = "data\Test_FAQ.txt"
-    result_path = "data\KhanhDB_result.csv"
+    result_path = "data\HoangLM_result_2.csv"
     API_key()
     qa_chain = chatbot()
     run_and_save(qa_chain,data_path, result_path)
