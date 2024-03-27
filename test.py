@@ -5,7 +5,7 @@ import textwrap
 import sys
 import langchain
 import torch
-import faiss
+#import faiss
 import langchain_core
 
 from langchain.chains import RetrievalQA
