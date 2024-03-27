@@ -5,7 +5,7 @@ import textwrap
 import sys
 import langchain
 import torch
-import faiss
+# import faiss/
 import langchain_core
 
 from langchain.chains import RetrievalQA
@@ -72,7 +72,7 @@ def chatbot() -> dict:
 
     return qa_chain
 
-def run_and_save(qa_chain: dict, input_file_path: str, output_file_path: csv) -> csv: 
+def run_and_save(qa_chain: dict, input_file_path: str, save_csv: csv) -> csv: 
     """
     yêu cầu bộ data phải chuẩn format, cuối mỗi câu hỏi phải có dấu chấm hỏi
     không khoảng trắng so với kí tự cuối, mỗi câu không cần có enter xuống dòng
@@ -80,7 +80,7 @@ def run_and_save(qa_chain: dict, input_file_path: str, output_file_path: csv) ->
     if torch.cuda.is_available():
         device = torch.cuda.get_device_name()
     
-    with open(output_file_path, 'w', newline='', encoding='utf-8') as csvfile:
+    with open(save_csv, 'w', newline='', encoding='utf-8') as csvfile:
         fieldnames = ['query', 'result', 'inference_time', 'device']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
@@ -100,9 +100,11 @@ def run_and_save(qa_chain: dict, input_file_path: str, output_file_path: csv) ->
             writer.writerow({'query': query, 'result': result, 'inference_time': inference_time, 'device': device})
 
 def main() -> None:
+    data_path = "data\Test_FAQ.txt"
+    result_path = "data\KhanhDB_result.csv"
     API_key()
     qa_chain = chatbot()
-    run_and_save(qa_chain)
+    run_and_save(qa_chain,data_path, result_path)
 
 if __name__ == "__main__":
     main()
