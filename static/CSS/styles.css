@@ -1,3 +1,9 @@
+/* Import Google font - Poppins */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+*{
+  font-family: "Poppins", sans-serif;
+}
+
 a{text-decoration: none;}
 .header {
   display: flex;
@@ -69,7 +75,7 @@ a{text-decoration: none;}
   display: inline-block;
   margin: 10px;
   color: #ffffff;
-  font-family: Helvetica;
+  /* font-family: Helvetica; */
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -125,7 +131,7 @@ a{text-decoration: none;}
     transform: scale(1);
   }
 }
-
+/* NOTICE */
 img{
   width: 100%;
   height: auto;
@@ -151,7 +157,7 @@ img{
 /* *********************** */
 .why_fpt {
   background-color: rgba(255, 105, 0, 1);
-  font-family: Arial, sans-serif;
+  /* font-family: Arial, sans-serif; */
   margin: 0;
   padding: 0;
   display: flex;
@@ -201,7 +207,7 @@ h1{
 /* ************************************** */
 .major {
   background-color: rgb(255, 255, 255);
-  font-family: Arial, sans-serif;
+  /* font-family: Arial, sans-serif; */
   margin-top: 30px;
   padding: 10px;
   display: flex;
@@ -384,8 +390,7 @@ h2{
 
 
 /*  */
-/* Import Google font - Poppins */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
 
 * {
   margin: 0;
@@ -452,7 +457,7 @@ body.show-chatbot .chatbot {
   position: relative;
   text-align: center;
   color: #fff;
-  background: #724ae8;
+  background:#fd8915;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 .chatbot header span {
@@ -466,6 +471,7 @@ body.show-chatbot .chatbot {
 header h2 {
   font-size: 1.4rem;
   padding:10px;
+  color: #ffffff;
 }
 .chatbot .chatbox {
   overflow-y: auto;
@@ -491,17 +497,20 @@ header h2 {
   margin: 20px 0;
   justify-content: flex-end;
 }
+.chatbox .outgoing p{
+  text-align: left;
+}
 .chatbox .incoming span {
   width: 32px;
   height: 32px;
-  color: #fff;
+  color: #ffffff;
   cursor: default;
   text-align: center;
   line-height: 32px;
   align-self: flex-end;
-  background: #724ae8;
+  background: #fd8915;
   border-radius: 4px;
-  margin: 0 10px 7px 0;
+  margin: 0 10px 2px 0;
 }
 .chatbox .chat p {
   white-space: pre-wrap;
