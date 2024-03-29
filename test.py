@@ -5,7 +5,6 @@ import textwrap
 import sys
 import langchain
 import torch
-# import faiss/
 import langchain_core
 
 from langchain.chains import RetrievalQA
@@ -72,7 +71,7 @@ def chatbot() -> dict:
 
     return qa_chain
 
-def run_and_save(qa_chain: dict, input_file_path: str, save_csv: csv) -> csv: 
+def run_and_save(qa_chain: dict, input_file_path: str, save_csv: str, wait_time: float = 5) -> None:
     """
     yêu cầu bộ data phải chuẩn format, cuối mỗi câu hỏi phải có dấu chấm hỏi
     không khoảng trắng so với kí tự cuối, mỗi câu không cần có enter xuống dòng
@@ -87,21 +86,24 @@ def run_and_save(qa_chain: dict, input_file_path: str, save_csv: csv) -> csv:
         writer.writeheader()
 
         with open(input_file_path, 'r', encoding='utf-8') as file:
-            data = file.read()
+            for line in file:
+                parts = line.strip().split('\t')
+                if len(parts) == 2:
+                    query = parts[0]  
+                    start_time = time.time()
+                    result = qa_chain.invoke(query)
+                    inference_time = time.time() - start_time
 
-        sentences = data.split('?')
+                    result_text = result['result'] if 'result' in result else ''
 
-        for sentence in sentences:
-            query = sentence.strip()
-            start_time = time.time()
-            result = qa_chain.invoke(query)
-            inference_time = time.time() - start_time
 
-            writer.writerow({'query': query, 'result': result, 'inference_time': inference_time, 'device': device})
+                    writer.writerow({'query': query, 'result': result_text, 'inference_time': inference_time, 'device': device})
+
+                    #time.sleep(wait_time)
 
 def main() -> None:
-    data_path = "data\Test_FAQ.txt"
-    result_path = "data\KhanhDB_result.csv"
+    data_path = "data\Test FAQ.txt"
+    result_path = "data\KhanhDB_result_1.csv"
     API_key()
     qa_chain = chatbot()
     run_and_save(qa_chain,data_path, result_path)
