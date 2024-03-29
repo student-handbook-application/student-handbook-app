@@ -102,9 +102,11 @@ def run_and_save(qa_chain: dict, input_file_path: str, save_csv: str, wait_time:
                     #time.sleep(wait_time)
 
 def main() -> None:
+    data_path = "data\Test FAQ.txt"
+    result_path = "data\KhanhDB_result_1.csv"
     API_key()
     qa_chain = chatbot()
-    run_and_save(qa_chain)
+    run_and_save(qa_chain,data_path, result_path)
 
 if __name__ == "__main__":
     main()
