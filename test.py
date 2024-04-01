@@ -1,18 +1,13 @@
 import os
 import csv
 import time
-import textwrap
-import sys
-import langchain
 import torch
-import langchain_core
 
 from langchain.chains import RetrievalQA
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from transformers import pipeline
 from qdrant_client import qdrant_client
-from qdrant_client import QdrantClient
 from langchain_core.prompts import PromptTemplate
 from langchain_community.vectorstores import Qdrant
 from langchain_community.llms.huggingface_pipeline import HuggingFacePipeline
@@ -21,6 +16,32 @@ def API_key() -> None:
     os.environ["QDRANT_HOST"] = "https://ef3d190d-4471-4044-b8a5-6aba8c656aa8.us-east4-0.gcp.cloud.qdrant.io:6333"
     os.environ["QDRANT_API_KEY"] = "EPOl1GIG9WTr2joExRzwjRkk5LuLWNvImfgU4y2GPaN_Nu5kWcs51w"
     os.environ["HUGGINGFACEHUB_API_TOKEN"] = "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"
+
+
+
+def generate_prompte_template():
+    # template="""
+    # <|im_start|>system\nBạn là một trợ lý AI hữu ích. Bạn chỉ sử dụng những thông tin mà bạn được cung cấp để trả lời các câu hỏi,
+    # hãy trả lời câu hỏi một cách ngắn gọn, trung thực và chính xác. Tránh trả lời các câu hỏi không có trong thông tin mà bạn được cung cấp.
+    # Nếu câu hỏi không liên quan đến nội dung mà bạn được cung cấp, bạn hãy trả lời rằng bạn không biết câu trả lời. Không được sử dụng những kiến thức
+    # mà bạn đã học để tạo ra câu trả lời\n{context}<|im_end|>\n<|im_start|>user\n{question}<|im_end|>\n<|im_start|>assitant"""
+
+
+    # template = """
+    # <|im_start|>system\nBạn là một trợ lý AI hữu ích. Bạn chỉ sử dụng những thông tin mà bạn được cung cấp để trả lời các câu hỏi,
+    # hãy trả lời câu hỏi một cách ngắn gọn, trung thực và chính xác. Tránh trả lời các câu hỏi không có trong thông tin mà bạn được cung cấp.
+    # Nếu câu hỏi không liên quan đến nội dung mà bạn được cung cấp, bạn hãy trả lời rằng "Tôi không biết câu trả lời".Tuyệt đối không được sử dụng những kiến thức
+    # mà bạn đã học để tạo ra câu trả lời\n{context}<|im_end|>\n<|im_start|>user\n{question}<|im_end|>\n<|im_start|>assitant"""
+
+
+    # template = """
+    # <|im_start|>system\nBạn là một bậc thầy trong công việc làm trợ lý ảo. Bạn chỉ được sử dụng những thông tin mà bạn được cung cấp để trả lời các câu hỏi,
+    # hãy trả lời câu hỏi một cách ngắn gọn, trung thực và chính xác. Tránh trả lời các câu hỏi không có trong thông tin mà bạn được cung cấp.
+    # Nếu câu hỏi không liên quan đến nội dung mà bạn được cung cấp, bạn hãy trả lời rằng "Tôi không biết câu trả lời". Bỏ qua những tìm kiếm ngoại lệ không liên quan đến câu hỏi.
+    # Không được sử dụng những kiến thức mà bạn đã học để bịa ra câu trả lời\n{context}<|im_end|>\n<|im_start|>user\n{question}<|im_end|>\n<|im_start|>assitant"""
+    
+    return template
+
 
 def chatbot() -> dict:
     client = qdrant_client.QdrantClient(
@@ -54,8 +75,9 @@ def chatbot() -> dict:
 
     llm = HuggingFacePipeline(pipeline=pipe, model_kwargs={"temperature": 0.05})
 
-    template = """<|im_start|>system\nSử dụng thông tin sau đây để trả lời câu hỏi. Nếu bạn không biết câu trả lời, hãy nói không biết, đừng cố tạo ra câu trả lời\n
-    {context}<|im_end|>\n<|im_start|>user\n{question}<|im_end|>\n<|im_start|>assitant"""
+#     template = """<|im_start|>system\nChỉ sử dụng thông tin sau đây để trả lời câu hỏi. Nếu câu hỏi không liên quan dến nội dung sau đây, hãy trả lời rằng bạn không biết câu trả lời, đừng cố sinh thêm thông tin để trả lời\n
+# {context}<|im_end|>\n<|im_start|>user\n{question}<|im_end|>\n<|im_start|>assitant"""
+    template = generate_prompte_template()
     QA_CHAIN_PROMPT = PromptTemplate.from_template(template)
 
     qa_chain = RetrievalQA.from_chain_type(
@@ -102,8 +124,8 @@ def run_and_save(qa_chain: dict, input_file_path: str, save_csv: str, wait_time:
                     #time.sleep(wait_time)
 
 def main() -> None:
-    data_path = "data\Test FAQ.txt"
-    result_path = "data\KhanhDB_result_1.csv"
+    data_path = "data\Test_FAQ.txt"
+    result_path = "data\KhanhDB_result_5.csv"
     API_key()
     qa_chain = chatbot()
     run_and_save(qa_chain,data_path, result_path)
