@@ -1,39 +1,45 @@
+import langchain 
 import torch
-import langchain
-import langchain_core
+import os
+from langchain.chains import RetrievalQA
 from langchain_community.llms import CTransformers
 from langchain_core.prompts import PromptTemplate
-from langchain.chains import RetrievalQA
-from chatbot.auguments import load_auguments
 from langchain_community.vectorstores import Qdrant
 from qdrant_client import qdrant_client
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from sentence_transformers import SentenceTransformer
-class Model:
-    def __init__(self, model_path: str, temperatures: float) -> None:
-        """
-        Auguments
-        model_id: the folder path of model that you choose in Hugging Face
-        token_id: the token api of hugging face account
-        temperatures: this auguments make model will creative when it is generating
-        """
+from chatbot.auguments import *
+# class Model:
+#     def __init__(self, model_path: str) -> None:
+#         """
+#         Auguments
+#         model_id: the folder path of model that you choose in Hugging Face
+#         token_id: the token api of hugging face account
+#         temperatures: this auguments make model will creative when it is generating
+#         """
 
-        self.model_path = model_path
-        self.model_type = "llama"
-        self.temperature = temperatures
+#         self.model_path = model_path
+#         self.model_type = "llama"
+#         self.temperature = 0.01
 
         
 
-    def load_model(self):
-        llm  = CTransformers(model = self.model_path,
-                             model_type =self.model_type, 
-                             max_new_token=512,
-                             temperature = self.temperature,
-                             top_k= 3)
-        return llm
+#     def load_model(self):
+#         config = {'context_length' : 2048}
+#         llm  = CTransformers(model = self.model_path,
+#                              model_type =self.model_type, 
+#                              max_new_token=1024,
+#                              temperature = self.temperature,
+#                              config = config)
+#         return llm
     
+def load_model(model_path):
+    config = {'context_length' : 2048}
+    llm = CTransformers(model = model_path,model_type ="llama", max_new_token=1024,temperature = 0.01,config= config)
+    return llm
 
-def create_prompt(templates: None) -> langchain_core.prompts.prompt.PromptTemplate:
+
+def create_prompt(templates: None) :
     qa_chain_prompt = PromptTemplate.from_template(templates)
     return qa_chain_prompt
 
