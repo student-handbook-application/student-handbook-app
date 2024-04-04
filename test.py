@@ -20,30 +20,25 @@ def API_key() -> None:
 
 
 def generate_prompte_template():
-    # template="""
-    # <|im_start|>system\nBạn là một trợ lý AI hữu ích. Bạn chỉ sử dụng những thông tin mà bạn được cung cấp để trả lời các câu hỏi,
-    # hãy trả lời câu hỏi một cách ngắn gọn, trung thực và chính xác. Tránh trả lời các câu hỏi không có trong thông tin mà bạn được cung cấp.
-    # Nếu câu hỏi không liên quan đến nội dung mà bạn được cung cấp, bạn hãy trả lời rằng bạn không biết câu trả lời. Không được sử dụng những kiến thức
-    # mà bạn đã học để tạo ra câu trả lời\n{context}<|im_end|>\n<|im_start|>user\n{question}<|im_end|>\n<|im_start|>assitant"""
+    templates=["""<|im_start|>system\nBạn là một trợ lý AI hữu ích. Bạn chỉ sử dụng những thông tin mà bạn được cung cấp để trả lời các câu hỏi,
+    hãy trả lời câu hỏi một cách ngắn gọn, trung thực và chính xác. Tránh trả lời các câu hỏi không có trong thông tin mà bạn được cung cấp.
+    Nếu câu hỏi không liên quan đến nội dung mà bạn được cung cấp, bạn hãy trả lời rằng bạn không biết câu trả lời. Không được sử dụng những kiến thức
+    mà bạn đã học để tạo ra câu trả lời\n{context}<|im_end|>\n<|im_start|>user\n{question}<|im_end|>\n<|im_start|>assitant""",
 
+    """<|im_start|>system\nBạn là một trợ lý AI hữu ích. Bạn chỉ sử dụng những thông tin mà bạn được cung cấp để trả lời các câu hỏi,
+    hãy trả lời câu hỏi một cách ngắn gọn, trung thực và chính xác. Tránh trả lời các câu hỏi không có trong thông tin mà bạn được cung cấp.
+    Nếu câu hỏi không liên quan đến nội dung mà bạn được cung cấp, bạn hãy trả lời rằng "Tôi không biết câu trả lời".Tuyệt đối không được sử dụng những kiến thức
+    mà bạn đã học để tạo ra câu trả lời\n{context}<|im_end|>\n<|im_start|>user\n{question}<|im_end|>\n<|im_start|>assitant""",
 
-    # template = """
-    # <|im_start|>system\nBạn là một trợ lý AI hữu ích. Bạn chỉ sử dụng những thông tin mà bạn được cung cấp để trả lời các câu hỏi,
-    # hãy trả lời câu hỏi một cách ngắn gọn, trung thực và chính xác. Tránh trả lời các câu hỏi không có trong thông tin mà bạn được cung cấp.
-    # Nếu câu hỏi không liên quan đến nội dung mà bạn được cung cấp, bạn hãy trả lời rằng "Tôi không biết câu trả lời".Tuyệt đối không được sử dụng những kiến thức
-    # mà bạn đã học để tạo ra câu trả lời\n{context}<|im_end|>\n<|im_start|>user\n{question}<|im_end|>\n<|im_start|>assitant"""
-
-
-    # template = """
-    # <|im_start|>system\nBạn là một bậc thầy trong công việc làm trợ lý ảo. Bạn chỉ được sử dụng những thông tin mà bạn được cung cấp để trả lời các câu hỏi,
-    # hãy trả lời câu hỏi một cách ngắn gọn, trung thực và chính xác. Tránh trả lời các câu hỏi không có trong thông tin mà bạn được cung cấp.
-    # Nếu câu hỏi không liên quan đến nội dung mà bạn được cung cấp, bạn hãy trả lời rằng "Tôi không biết câu trả lời". Bỏ qua những tìm kiếm ngoại lệ không liên quan đến câu hỏi.
-    # Không được sử dụng những kiến thức mà bạn đã học để bịa ra câu trả lời\n{context}<|im_end|>\n<|im_start|>user\n{question}<|im_end|>\n<|im_start|>assitant"""
+    """<|im_start|>system\nBạn là một bậc thầy trong công việc làm trợ lý ảo. Bạn chỉ được sử dụng những thông tin mà bạn được cung cấp để trả lời các câu hỏi,
+    hãy trả lời câu hỏi một cách ngắn gọn, trung thực và chính xác. Tránh trả lời các câu hỏi không có trong thông tin mà bạn được cung cấp.
+    Nếu câu hỏi không liên quan đến nội dung mà bạn được cung cấp, bạn hãy trả lời rằng "Tôi không biết câu trả lời". Bỏ qua những tìm kiếm ngoại lệ không liên quan đến câu hỏi.
+    Không được sử dụng những kiến thức mà bạn đã học để bịa ra câu trả lời\n{context}<|im_end|>\n<|im_start|>user\n{question}<|im_end|>\n<|im_start|>assitant"""]
     
-    return template
+    return templates
 
 
-def chatbot() -> dict:
+def chatbot(QA_CHAIN_PROMPT) -> dict:
     client = qdrant_client.QdrantClient(
         url=os.getenv("QDRANT_HOST"),
         api_key=os.getenv("QDRANT_API_KEY")
@@ -75,11 +70,6 @@ def chatbot() -> dict:
 
     llm = HuggingFacePipeline(pipeline=pipe, model_kwargs={"temperature": 0.05})
 
-#     template = """<|im_start|>system\nChỉ sử dụng thông tin sau đây để trả lời câu hỏi. Nếu câu hỏi không liên quan dến nội dung sau đây, hãy trả lời rằng bạn không biết câu trả lời, đừng cố sinh thêm thông tin để trả lời\n
-# {context}<|im_end|>\n<|im_start|>user\n{question}<|im_end|>\n<|im_start|>assitant"""
-    template = generate_prompte_template()
-    QA_CHAIN_PROMPT = PromptTemplate.from_template(template)
-
     qa_chain = RetrievalQA.from_chain_type(
         llm=llm,
         chain_type='stuff',  
@@ -93,7 +83,7 @@ def chatbot() -> dict:
 
     return qa_chain
 
-def run_and_save(qa_chain: dict, input_file_path: str, save_csv: str, wait_time: float = 5) -> None:
+def run_and_save(qa_chain: dict, input_file_path: str, save_csv: str, template: str, wait_time: float = 5) -> None:
     """
     yêu cầu bộ data phải chuẩn format, cuối mỗi câu hỏi phải có dấu chấm hỏi
     không khoảng trắng so với kí tự cuối, mỗi câu không cần có enter xuống dòng
@@ -102,9 +92,8 @@ def run_and_save(qa_chain: dict, input_file_path: str, save_csv: str, wait_time:
         device = torch.cuda.get_device_name()
     
     with open(save_csv, 'w', newline='', encoding='utf-8') as csvfile:
-        fieldnames = ['query', 'result', 'inference_time', 'device']
+        fieldnames = ['template', 'query', 'result', 'inference_time', 'device']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-
         writer.writeheader()
 
         with open(input_file_path, 'r', encoding='utf-8') as file:
@@ -117,18 +106,18 @@ def run_and_save(qa_chain: dict, input_file_path: str, save_csv: str, wait_time:
                     inference_time = time.time() - start_time
 
                     result_text = result['result'] if 'result' in result else ''
-
-
-                    writer.writerow({'query': query, 'result': result_text, 'inference_time': inference_time, 'device': device})
-
+                    writer.writerow({'template': template, 'query': query, 'result': result_text, 'inference_time': inference_time, 'device': device})
                     #time.sleep(wait_time)
 
 def main() -> None:
-    data_path = "data\Test FAQ.txt"
-    result_path = "data\KhanhDB_result_1.csv"
+    data_path = "data\Test_FAQ.txt"
+    result_path = "data\HoangLM_result_template_3.csv"
     API_key()
-    qa_chain = chatbot()
-    run_and_save(qa_chain,data_path, result_path)
+    templates = generate_prompte_template()
+    for template in templates:
+        QA_CHAIN_PROMPT = PromptTemplate.from_template(template)
+        qa_chain = chatbot(QA_CHAIN_PROMPT)
+        run_and_save(qa_chain, data_path, result_path, template)
 
 if __name__ == "__main__":
     main()
