@@ -32,7 +32,7 @@ const generateResponse = (chatElement) => {
             "Authorization": `Bearer ${API_KEY}`
         },
         body: JSON.stringify({
-            model: "ten model ",
+            model: "ten model",
             messages: [{role: "user", content: userMessage}],
         })
     }
