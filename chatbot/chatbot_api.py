@@ -16,7 +16,7 @@ llm = None
 @bp.before_app_first_request
 def load_llm():
     global llm
-    model_path = "./model/vinallama-7b-chat_q5_0.gguf"
+    model_path = r"model\cache\hub\vinallama-7b-chat_q5_0.gguf"
     llm = load_model(model_path)
     
 
