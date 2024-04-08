@@ -8,6 +8,7 @@ from langchain_community.vectorstores import Qdrant
 from qdrant_client import qdrant_client
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from sentence_transformers import SentenceTransformer
+from langchain.memory import ConversationBufferMemory
 from chatbot.auguments import *
 
 
@@ -32,7 +33,11 @@ def create_qa_chain(prompt, llm, db):
                                     max_token_limit = 1024),
         return_source_documents = False,
         chain_type_kwargs = {'prompt': prompt,
-                             "verbose": True}
+                             "verbose": True,
+                             "memory":ConversationBufferMemory(
+                            memory_key="history",
+                            input_key="question"),
+                    }
     )
 
     return qa_chain
@@ -59,19 +64,47 @@ def main():
     db = load_doc(api_key_database,url_database,hf_embedding_model)
     llm = load_model(model_path)
 
-    template = """<|im_start|>system\nBạn là một trợ lý AI hữu ích. Bạn chỉ sử dụng những thông tin mà bạn được cung cấp để trả lời các câu hỏi,
+    # template = """<|im_start|>system\nBạn là một trợ lý AI hữu ích. Bạn chỉ sử dụng những thông tin mà bạn được cung cấp để trả lời các câu hỏi,
+    # hãy trả lời câu hỏi một cách ngắn gọn, trung thực và chính xác. Tránh trả lời các câu hỏi không có trong thông tin mà bạn được cung cấp.
+    # Nếu câu hỏi không liên quan đến nội dung mà bạn được cung cấp, bạn hãy trả lời rằng bạn không biết câu trả lời.Tuyệt đối không được bịa ra
+    # câu trả lời.\n
+    # {context}<|im_end|>\n<|im_start|>user\n{question}<|im_end|>\n<|im_start|>assistant"""
+
+    template = """<|im_start|>system
+    Bạn là một trợ lý AI hữu ích. Bạn chỉ sử dụng những thông tin mà bạn được cung cấp để trả lời các câu hỏi,
     hãy trả lời câu hỏi một cách ngắn gọn, trung thực và chính xác. Tránh trả lời các câu hỏi không có trong thông tin mà bạn được cung cấp.
     Nếu câu hỏi không liên quan đến nội dung mà bạn được cung cấp, bạn hãy trả lời rằng bạn không biết câu trả lời.Tuyệt đối không được bịa ra
-    câu trả lời.\n
-    {context}<|im_end|>\n<|im_start|>user\n{question}<|im_end|>\n<|im_start|>assistant"""
+    câu trả lời.
+    {context}<|im_end|>
+    <|im_start|>user
+    {question}<|im_end|>
+    <|im_start|>assistant"""
+
+#     template = """<|im_start|>system
+# Bạn là một trợ lý AI hữu ích. Bạn chỉ sử dụng những thông tin mà bạn được cung cấp để trả lời các câu hỏi,hãy trả lời câu hỏi một cách ngắn gọn, trung thực và chính xác. Tránh trả lời các câu hỏi không có trong thông tin mà bạn được cung cấp.
+# Nếu câu hỏi không liên quan đến nội dung mà bạn được cung cấp, bạn hãy trả lời rằng bạn không biết câu trả lời.Tuyệt đối không được bịa ra câu trả lời.\n
+# {context}
+# <|im_end|>
+# <|im_start|>user
+# {question}<|im_end|>
+# <|im_start|>assistant
+# """
     
     prompt = create_prompt(template)
 
     qa_chain = create_qa_chain(prompt,llm,db)
 
-    question = "Hiệu trưởng trường đại học FPT là ai?"
-    response =  qa_chain.invoke({"query":question})
-    print(response)
+    question_1 = "Khánh Dương là ai?"
+    response_1 =  qa_chain.invoke({"query":question_1})
+    print(response_1)
+
+    # question_2 = "vậy người đó có phải là hiệu trường đầu tiên tại đại học FPT không?"
+    # response_2 =  qa_chain.invoke({"query":question_2})
+    # print(response_2)    
+
+    # question_3 = "Cảm ơn vì thông tin hữu ích"
+    # response_3 =  qa_chain.invoke({"query":question_3})
+    # print(response_3) 
 
 
 if __name__ == "__main__":
