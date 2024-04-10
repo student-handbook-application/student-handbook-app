@@ -13,7 +13,7 @@ bp = Blueprint('chatbot', __name__)
 #ktra model dc load len hay chua, neu chua se load len, neu ton tai thi se hoi lai thoi
 #hoac xep cung model(model luon mo) chay trc trang web
 llm = None
-@bp.before_app_first_request
+@bp.before_app_request
 def load_llm():
     global llm
     hf_api ,_, model_id, _, _ = load_auguments()

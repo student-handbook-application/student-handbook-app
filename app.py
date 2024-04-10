@@ -3,6 +3,8 @@ from chatbot import chatbot_api
 import os
 from chatbot.auguments import load_auguments
 from chatbot.model  import *
+import accelerate
+import bitsandbytes
 
 SECRET_KEY = os.environ.get("KEY")
 DB_NAME = os.environ.get("DB_NAME")
