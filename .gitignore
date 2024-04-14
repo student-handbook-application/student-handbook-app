@@ -3,3 +3,4 @@ model/
 vinallama-7b-chat_onnx/
 .vscode/
 .ipynb_checkpoints/
+test/
