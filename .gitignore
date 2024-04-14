@@ -1,3 +1,5 @@
 __pycache__/
 model/
 vinallama-7b-chat_onnx/
+.vscode/
+.ipynb_checkpoints/

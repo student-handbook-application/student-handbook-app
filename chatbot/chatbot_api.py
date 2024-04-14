@@ -16,12 +16,9 @@ llm = None
 @bp.before_app_first_request
 def load_llm():
     global llm
-    model_path = "model/vinallama-7b-chat_q5_0.gguf"
-    
-    
-    model = Model(model_path, 0.01)
+    hf_api,_, model_id, _, _ = load_auguments()
+    model = Model(model_id,hf_api,0.01)
     llm = model.load_model()
-    
 
 @bp.route("/get", methods=['POST'])  # Đảm bảo route chỉ chấp nhận phương thức POST
 def get_bot_response():
