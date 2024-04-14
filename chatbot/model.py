@@ -1,6 +1,5 @@
 import torch
 import langchain
-import langchain_core
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from langchain_community.llms.huggingface_pipeline import HuggingFacePipeline
 from transformers import pipeline
@@ -54,9 +53,10 @@ class Model:
         return llm
     
 
-def create_prompt(templates: None) -> langchain_core.prompts.prompt.PromptTemplate:
-    qa_chain_prompt = PromptTemplate.from_template(templates)
-    return qa_chain_prompt
+def create_prompt(templete):
+    prompt = PromptTemplate(template= templete,
+                            input_variables=["context","history","question"])
+    return prompt
 
 
 def create_qa_chain(llm: any, prompt: any) -> langchain.chains.retrieval_qa.base.RetrievalQA:
@@ -74,18 +74,21 @@ def create_qa_chain(llm: any, prompt: any) -> langchain.chains.retrieval_qa.base
     )
 
 
-    memory = ConversationBufferMemory(
-            memory_key='chat_history', return_messages=True)
+    # memory = ConversationBufferMemory(
+    #         memory_key='chat_history', return_messages=True)
     
     qa_chain = RetrievalQA.from_chain_type(
         llm=llm,
         chain_type='stuff',  # Change 'stuff' to a valid chain type
-        retriever=  doc_store.as_retriever(search_kwargs={"k": 3}),
+        retriever=  doc_store.as_retriever(search_kwargs={"k": 3},max_new_token = 1024),
         return_source_documents = False, #trả về src trả lời
         # memory = memory,
         chain_type_kwargs={
             "verbose": True,
-            "prompt": prompt
+            "prompt": prompt,
+            "memory":ConversationBufferMemory(
+                            memory_key="history",
+                            input_key="question"),
         }
     )
     return qa_chain
