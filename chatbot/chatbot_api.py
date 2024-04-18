@@ -16,9 +16,9 @@ llm = None
 @bp.before_app_first_request
 def load_llm():
     global llm
-    model_path = r"model\cache\hub\vinallama-7b-chat_q5_0.gguf"
-    llm = load_model(model_path)
-    
+    google_api_key ,hf_embedding_model, model_id, url_database, api_key_database = load_auguments()
+    model = Model(model_id,google_api_key,0.2)
+    llm = model.load_model()
 
 @bp.route("/get", methods=['POST'])  # Đảm bảo route chỉ chấp nhận phương thức POST
 def get_bot_response():
