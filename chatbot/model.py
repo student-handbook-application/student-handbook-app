@@ -61,7 +61,7 @@ def create_qa_chain(llm: any, prompt: any) -> langchain.chains.retrieval_qa.base
     qa_chain = RetrievalQA.from_chain_type(
         llm=llm,
         chain_type='stuff',  # Change 'stuff' to a valid chain type
-        retriever=  doc_store.as_retriever(search_kwargs={"k": 3}),
+        retriever=  doc_store.as_retriever(search_kwargs={"k": 3,"score_threshold": 0.3}),
         return_source_documents = False, #trả về src trả lời
         # memory = memory,
         chain_type_kwargs={
@@ -88,3 +88,10 @@ def load_FAQ(msg):
     )
 
     return hits
+
+def save_conversation_history(conversation_logs):
+    with open("data/conversation_logs.txt", "a",encoding="utf-8") as file:
+        for log in conversation_logs:
+            file.write(f"User: {log['user_message']}\n")
+            file.write(f"AI: {log['ai_response']}\n")
+        file.write("\n")

@@ -9,9 +9,15 @@ Answer:"""
 
     #run result
     for hit in hits:
-        if hit.score > 0.49:
+        if hit.score > 0.4:
+            conversation_logs = [{"user_message": msg, "ai_response": hit.payload['Answers']}]
+            save_conversation_history(conversation_logs)
             return f"{hit.payload['Answers']}"
         else: 
             prompt = create_prompt(template)
             qa_chain = create_qa_chain(llm, prompt)
-            return qa_chain.invoke({"query": msg})
+            result = qa_chain.invoke({"query": msg})['result']
+            conversation_logs = [{"user_message": msg, "ai_response": result}]
+            save_conversation_history(conversation_logs)
+            return result
+        
