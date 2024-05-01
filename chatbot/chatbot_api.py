@@ -16,8 +16,8 @@ llm = None
 @bp.before_app_first_request
 def load_llm():
     global llm
-    hf_api,_, model_id, _, _ = load_auguments()
-    model = Model(model_id,hf_api,0.01)
+    google_api_key ,hf_embedding_model, model_id, url_database, api_key_database = load_auguments()
+    model = Model(model_id,google_api_key,0.2)
     llm = model.load_model()
 
 @bp.route("/get", methods=['POST'])  # Đảm bảo route chỉ chấp nhận phương thức POST
