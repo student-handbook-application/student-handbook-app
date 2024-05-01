@@ -12,7 +12,9 @@ const createChatLi = (message, className) => {
     // Create a chat <li> element with passed message and className
     const chatLi = document.createElement("li");
     chatLi.classList.add("chat", `${className}`);
-    let chatContent = className === "outgoing" ? `<p></p>` : `<span class="material-symbols-outlined">smart_toy</span><p></p>`;
+    let chatContent = className === "outgoing" ? `<p></p>` : `<span class="material-symbols-outlined"><span class="material-symbols-outlined">
+    support_agent
+    </span></span><p></p>`;
     chatLi.innerHTML = chatContent;
     chatLi.querySelector("p").textContent = message;
     return chatLi; // return chat <li> element
@@ -38,10 +40,10 @@ const generateResponse = (chatElement) => {
     // Send POST request to API, get response and set the reponse as paragraph text
     fetch("/get", requestOptions).then(res => res.json()).then(data => {
         console.log(data)
-        messageElement.textContent = data.processed_message.result ? data.processed_message.result.trim() : data.processed_message.trim();
+        messageElement.textContent = data.processed_message.trim();
     }).catch(() => {
         messageElement.classList.add("error");
-        messageElement.textContent = "Đã xảy ra lỗi vui lòng thử lại.";
+        messageElement.textContent = "Oops! Something went wrong. Please try again.";
     }).finally(() => chatbox.scrollTo(0, chatbox.scrollHeight));
 }
 
@@ -59,7 +61,7 @@ const handleChat = () => {
     
     setTimeout(() => {
         // Display "Thinking..." message while waiting for the response
-        const incomingChatLi = createChatLi("Đang suy nghĩ...", "incoming");
+        const incomingChatLi = createChatLi("Thinking...", "incoming");
         chatbox.appendChild(incomingChatLi);
         chatbox.scrollTo(0, chatbox.scrollHeight);
         generateResponse(incomingChatLi);
