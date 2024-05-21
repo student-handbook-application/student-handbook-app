@@ -12,9 +12,7 @@ const createChatLi = (message, className) => {
     // Create a chat <li> element with passed message and className
     const chatLi = document.createElement("li");
     chatLi.classList.add("chat", `${className}`);
-    let chatContent = className === "outgoing" ? `<p></p>` : `<span class="material-symbols-outlined"><span class="material-symbols-outlined">
-    support_agent
-    </span></span><p></p>`;
+    let chatContent = className === "outgoing" ? `<p></p>` : `<span class="material-symbols-outlined">smart_toy</span><p></p>`;
     chatLi.innerHTML = chatContent;
     chatLi.querySelector("p").textContent = message;
     return chatLi; // return chat <li> element
@@ -32,7 +30,7 @@ const generateResponse = (chatElement) => {
             "Authorization": `Bearer ${API_KEY}`
         },
         body: JSON.stringify({
-            model: "ten model",
+            model: "ten model ",
             messages: [{role: "user", content: userMessage}],
         })
     }
@@ -43,7 +41,7 @@ const generateResponse = (chatElement) => {
         messageElement.textContent = data.processed_message.trim();
     }).catch(() => {
         messageElement.classList.add("error");
-        messageElement.textContent = "Oops! Something went wrong. Please try again.";
+        messageElement.textContent = "Đã xảy ra lỗi vui lòng thử lại.";
     }).finally(() => chatbox.scrollTo(0, chatbox.scrollHeight));
 }
 
@@ -61,7 +59,7 @@ const handleChat = () => {
     
     setTimeout(() => {
         // Display "Thinking..." message while waiting for the response
-        const incomingChatLi = createChatLi("Thinking...", "incoming");
+        const incomingChatLi = createChatLi("Đang suy nghĩ...", "incoming");
         chatbox.appendChild(incomingChatLi);
         chatbox.scrollTo(0, chatbox.scrollHeight);
         generateResponse(incomingChatLi);
