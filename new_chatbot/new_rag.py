@@ -48,7 +48,6 @@ from langchain_core.output_parsers import StrOutputParser
 
 # Chroma: vectorstore
 from qdrant_db import client
-from langchain_community.vectorstores import Chroma
 from langchain_community.vectorstores import Qdrant
 
 
@@ -466,29 +465,8 @@ Standalone question:""")
 def _combine_documents(docs, document_prompt, document_separator="\n\n"):
     doc_strings = [format_document(doc, document_prompt) for doc in docs]
     return document_separator.join(doc_strings)
-
-
-def answer_template(language="english"):
-    """Pass the standalone question along with the chat history and context (retrieved documents) to the `LLM` to get an answer."""
     
-    template = f"""Answer the question at the end, using only the following context (delimited by <context></context>).
-Your answer must be in the language at the end. 
 
-<context>
-{{chat_history}}
-
-{{context}} 
-</context>
-
-Question: {{question}}
-
-Language: {language}.
-"""
-    return template
-    
-def _combine_documents(docs, document_prompt, document_separator="\n\n"):
-    doc_strings = [format_document(doc, document_prompt) for doc in docs]
-    return document_separator.join(doc_strings)
 
 def custom_ConversationalRetrievalChain(
     llm,condense_question_llm,
