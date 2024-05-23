@@ -14,9 +14,7 @@ client = qdrant_client.QdrantClient(
 print("Qrant client is connected.")
 
 #check the database Pengi-FAQ if is not exsit
-
-# print(type(client.get_collection("Pengi-FAQ")))
-if client.get_collection("Pengi-FAQ") == None:
+if qdrant_client.collection_exists("Pengi-FAQ") == False:
     client.recreate_collection(
     collection_name = "Pengi-FAQ",
     vectors_config = model.VectorParams(
@@ -28,28 +26,16 @@ if client.get_collection("Pengi-FAQ") == None:
 else:
     print("Pengi-FAQ collection is exsit.")
 
-# #check the database Pengi-Doc if is not exsit
-if client.get_collection("Pengi-Doc") == None:
 
-    docs = create_doc_db(pdf_path="../data/pdf_dataset/")
-    qdrant = Qdrant.from_documents(
-        docs,
-        model,
-        url=os.getenv("QDRANT_HOST"),
-        api_key= os.getenv("QDRANT_API_KEY"))
-    print("Pengi-Doc collection is created.")
-else:
-    print("Pengi-Doc collection is exsit.")
-
-# #check the database Pengi-Feedback if is not exsit
-if client.get_collection("Pengi-Feedback") == None:
+#check the database Pengi-Doc if is not exsit
+if qdrant_client.collection_exists("Pengi-Doc") == False:
     client.recreate_collection(
-    collection_name = "Pengi-Feedback",
+    collection_name = "Pengi-Doc",
     vectors_config = model.VectorParams(
         size = 768,
         distance = model.Distance.COSINE,
     )
 )
-    print("Pengi-Feedback collection is created.")
+    print("Pengi-Doc collection is created.")
 else:
-    print("Pengi-Feedback collection is exsit.")
+    print("Pengi-Doc collection is exsit.")  
