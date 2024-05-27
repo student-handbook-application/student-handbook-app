@@ -44,7 +44,7 @@ def create_chain(vectorstore):
     )
     history_aware_retriever = create_history_aware_retriever(
         llm,vectorstore.as_retriever(search_type="similarity_score_threshold",
-            search_kwargs={'score_threshold': 0.3,"k":3}), contextualize_q_prompt
+            search_kwargs={'score_threshold': 0.87,"k":3}), contextualize_q_prompt
     )
 
 
