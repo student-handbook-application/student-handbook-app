@@ -26,75 +26,86 @@ from langchain.chains.qa_with_sources.loading import load_qa_with_sources_chain
 from langchain.schema import Document
 load_dotenv()
 
-llm = ChatOpenAI(model_name="gpt-3.5-turbo", api_key=os.getenv("OPENAI_API_KEY"),temperature=0.05)
+def create_chain(vectorstore):
+    llm = ChatOpenAI(model_name="gpt-3.5-turbo", api_key=os.getenv("OPENAI_API_KEY"),temperature=0.05)
 
-if client.collection_exists("Pengi-Doc"):
-    vectorstore = Qdrant(
-        client=client, collection_name="Pengi-Doc", 
-        embeddings=OpenAIEmbeddings(),
+
+
+    contextualize_q_system_prompt = """Given a chat history and the latest user question \
+    which might reference context in the chat history, formulate a standalone question \
+    which can be understood without the chat history. Do NOT answer the question, \
+    just reformulate it if needed and otherwise return it as is."""
+    contextualize_q_prompt = ChatPromptTemplate.from_messages(
+        [
+            ("system", contextualize_q_system_prompt),
+            MessagesPlaceholder("chat_history"),
+            ("human", "{input}"),
+        ]
+    )
+    history_aware_retriever = create_history_aware_retriever(
+        llm,vectorstore.as_retriever(search_type="similarity_score_threshold",
+            search_kwargs={'score_threshold': 0.3,"k":3}), contextualize_q_prompt
     )
 
-contextualize_q_system_prompt = """Given a chat history and the latest user question \
-which might reference context in the chat history, formulate a standalone question \
-which can be understood without the chat history. Do NOT answer the question, \
-just reformulate it if needed and otherwise return it as is."""
-contextualize_q_prompt = ChatPromptTemplate.from_messages(
-    [
-        ("system", contextualize_q_system_prompt),
-        MessagesPlaceholder("chat_history"),
-        ("human", "{input}"),
-    ]
-)
-history_aware_retriever = create_history_aware_retriever(
-    llm, vectorstore.as_retriever(search_kwargs={"k": 5,"score_threshold":0.5}), contextualize_q_prompt
-)
+
+    ### Answer question ###
+    qa_system_prompt = """Let's think step by step. Your name is PENGI,you are CREATED from Pengi-Chatbot Team but this team does not belong to any organization .You are AI assistant about the admissions consultant for the student and parents about UNIVERSITY in Vietnamese country . 
+    Use the following pieces of context to answer the questions HONESTLY, ACCURATELY and MOST NATURAL. 
+    Avoid answering questions that are not included in the INFORMATIONs you are provided.\n
+
+    {context}"""
+    qa_prompt = ChatPromptTemplate.from_messages(
+        [
+            ("system", qa_system_prompt),
+            MessagesPlaceholder("chat_history"),
+            ("human", "{input}"),
+        ]
+    )
+    question_answer_chain = create_stuff_documents_chain(llm, qa_prompt)
+
+    rag_chain = create_retrieval_chain(history_aware_retriever, question_answer_chain)
 
 
-### Answer question ###
-qa_system_prompt = """Let's think step by step. Your name is PENGI,you are CREATED from Pengi-Chatbot Team but this team does not belong to any organization .You are AI assistant about the admissions consultant for the student and parents about UNIVERSITY in Vietnamese country . 
-Use the following pieces of context to answer the questions HONESTLY, ACCURATELY and MOST NATURAL. 
-Avoid answering questions that are not included in the INFORMATIONs you are provided.\n
-
-{context}"""
-qa_prompt = ChatPromptTemplate.from_messages(
-    [
-        ("system", qa_system_prompt),
-        MessagesPlaceholder("chat_history"),
-        ("human", "{input}"),
-    ]
-)
-question_answer_chain = create_stuff_documents_chain(llm, qa_prompt)
-
-rag_chain = create_retrieval_chain(history_aware_retriever, question_answer_chain)
+    ### Statefully manage chat history ###
+    store = {}
 
 
-### Statefully manage chat history ###
-store = {}
+    def get_session_history(session_id: str) -> BaseChatMessageHistory:
+        if session_id not in store:
+            store[session_id] = ChatMessageHistory()
+        return store[session_id]
 
 
-def get_session_history(session_id: str) -> BaseChatMessageHistory:
-    if session_id not in store:
-        store[session_id] = ChatMessageHistory()
-    return store[session_id]
+    conversational_rag_chain = RunnableWithMessageHistory(
+        rag_chain,
+        get_session_history,
+        input_messages_key="input",
+        history_messages_key="chat_history",
+        output_messages_key="answer",
+    )
+    return conversational_rag_chain
+
+def process_chain(chain,user_input,chat_history):
+    response = chain.invoke({'input': user_input, 'chat_history': chat_history},config={"configurable": {"session_id": "abc123"}})
+    return response
 
 
-conversational_rag_chain = RunnableWithMessageHistory(
-    rag_chain,
-    get_session_history,
-    input_messages_key="input",
-    history_messages_key="chat_history",
-    output_messages_key="answer",
-)
-
-chat_history = []
-while True:
-    user_input = input("You: ")
-    if user_input.lower() == 'exit':
-        break
-    result = conversational_rag_chain.invoke({'input': user_input, 'chat_history': chat_history},config={"configurable": {"session_id": "abc123"}})
-    response = result.get('answer')
-    documents = result.get("context")
-    chat_history.append(HumanMessage(content=user_input))
-    chat_history.append(AIMessage(content=response))
-    print(f"Pengi: {response}")
-    print(documents)
+if __name__ == "__main__":
+    if client.collection_exists("Pengi-Doc"):
+        vectorstore = Qdrant(
+            client=client, collection_name="Pengi-Doc", 
+            embeddings=OpenAIEmbeddings(),
+        )
+    chain = create_chain(vectorstore)
+    chat_history = []
+    while True:
+        user_input = input("You: ")
+        if user_input.lower() == 'exit':
+            break
+        result =  process_chain(chain,user_input,chat_history)
+        response = result.get('answer')
+        documents = result.get("context")
+        chat_history.append(HumanMessage(content=user_input))
+        chat_history.append(AIMessage(content=response))
+        print(f"Pengi: {response}")
+        print(documents)

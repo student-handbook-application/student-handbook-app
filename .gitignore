@@ -5,3 +5,4 @@ vinallama-7b-chat_onnx/
 .ipynb_checkpoints/
 test/
 .env
+jupyter/
