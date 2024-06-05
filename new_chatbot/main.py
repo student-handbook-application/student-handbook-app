@@ -99,8 +99,8 @@ if __name__ == "__main__":
     #     client.delete_collection(collection_name="Pengi-Doc")
     # vectorstore = create_doc_db(pdf_path="data\pdf_dataset")
 
-    #này dùng db cũ, nếu dùng cái db mới thì comment line 99 -> 104, sau khi chạy khởi tạo xong
-    #chạy lần 2 thì comment line 94 -> 97 để kh cho db cứ recreate db mới
+    #này dùng db cũ, nếu dùng cái db mới thì uncomment line 97 -> 100 và comment line 104->108, sau khi chạy khởi tạo xong
+    #chạy lần 2 thì comment lại 97 -> 100 và uncoment line 104->108 để kh cho db cứ recreate db mới
     if client.collection_exists("Pengi-Doc"):
         vectorstore = Qdrant(
             client=client, collection_name="Pengi-Doc", 
