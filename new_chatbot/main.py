@@ -44,7 +44,7 @@ def create_chain(vectorstore):
     )
     history_aware_retriever = create_history_aware_retriever(
         llm,vectorstore.as_retriever(search_type="similarity_score_threshold",
-            search_kwargs={'score_threshold': 0.86,"k":3}), contextualize_q_prompt
+            search_kwargs={'score_threshold': 0.83 ,"k":3}), contextualize_q_prompt
     )
 
 
@@ -91,6 +91,16 @@ def process_chain(chain,user_input,chat_history):
 
 
 if __name__ == "__main__":
+    """
+    Muốn chỉnh sửa dữ liệu thì vào file vector.py, tại đó có chunk_size, chunk_overlap, separators, length_function
+    """
+    #này xoá db cũ đi để tạo db mới
+    # if client.collection_exists("Pengi-Doc"):
+    #     client.delete_collection(collection_name="Pengi-Doc")
+    # vectorstore = create_doc_db(pdf_path="data\pdf_dataset")
+
+    #này dùng db cũ, nếu dùng cái db mới thì comment line 99 -> 104, sau khi chạy khởi tạo xong
+    #chạy lần 2 thì comment line 94 -> 97 để kh cho db cứ recreate db mới
     if client.collection_exists("Pengi-Doc"):
         vectorstore = Qdrant(
             client=client, collection_name="Pengi-Doc", 
